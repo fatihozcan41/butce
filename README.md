@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım v6
+# Gelir Gider Dağıtım v7
 
-Hibrit oran modelini destekleyen sürüm.
+Oranlar tablo şeklinde girilir, önceki ayın oranları otomatik gelir.
 
 ```bash
 pip install -r requirements.txt
