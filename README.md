@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım Uygulaması (v5)
+# Gelir Gider Dağıtım v6
 
-V1 görünümüne sahip, oran girişli, kullanıcı dostu arayüz.
+Hibrit oran modelini destekleyen sürüm.
 
 ```bash
 pip install -r requirements.txt
