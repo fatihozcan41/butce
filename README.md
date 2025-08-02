@@ -1,15 +1,8 @@
-# Gelir Gider Dağıtım Uygulaması (v3)
+# Gelir Gider Dağıtım Uygulaması (v4)
 
-Bu sürümde her bir HESAP İSMİ için ayrı ayrı OSGB/BELGE ve alt kırılım oranları girilebilir. Tüm oranlar tablo formatında düzenlenir.
-
-## Kurulum
+Ana ekran bilgilendirmeleri ve HESAP İSMİ bazlı oran girişlidir.
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
-
-## Özellikler
-- HESAP İSMİ bazlı oran girişi
-- Toplam kontrolü (OSGB + BELGE = 100, alt kırılım = 100)
-- Oran girişi tablo üzerinden
