@@ -2,18 +2,25 @@ import streamlit as st
 import pandas as pd
 from utils.dagitim import dagit_verileri
 
-st.set_page_config(page_title="Gelir-Gider Dağıtım", layout="wide")
-st.title("📊 Gelir-Gider Dağıtım Uygulaması")
+st.set_page_config(page_title="📊 Gelir-Gider Dağıtım", layout="wide")
 
-st.sidebar.header("🗂 Dosya Yükleme")
-uploaded_file = st.sidebar.file_uploader("Excel dosyasını yükleyin", type=["xlsx"])
-firma = st.sidebar.selectbox("Firma", ["OSGB", "BELGE"])
-islem_turu = st.sidebar.selectbox("İşlem Türü", ["Gider", "Gelir"])
-yil = st.sidebar.number_input("Yıl", value=2025)
-ay = st.sidebar.selectbox("Ay", list(range(1, 13)))
+st.markdown("# 📊 Gelir-Gider Dağıtım Uygulaması")
 
-st.sidebar.header("📐 Oran Girişi")
-oran_df = st.sidebar.experimental_data_editor(
+# Sol Panel Arayüzü
+with st.sidebar:
+    st.markdown("## 📂 Dosya Yükleme")
+    uploaded_file = st.file_uploader("Excel dosyasını yükleyin", type=["xlsx"])
+    firma = st.selectbox("Firma", ["OSGB", "BELGE"])
+    islem_turu = st.selectbox("İşlem Türü", ["Gider", "Gelir"])
+    yil = st.number_input("Yıl", value=2025)
+    ay = st.selectbox("Ay", list(range(1, 13)))
+
+    st.markdown("---")
+    st.markdown("## 🎯 Hesap Bazlı Oran Girişi")
+
+# Oran Girişi - Sol panelde görünmeyen ama içerik uyumlu
+st.markdown("### 🎯 Hesap Bazlı Oran Girişi (Tablo)")
+oran_df = st.data_editor(
     pd.DataFrame({
         "HESAP İSMİ": ["ELEKTRİK", "OFİS GİDERİ"],
         "OSGB": [60, 70],

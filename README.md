@@ -1,1 +1,1 @@
-# Gelir Gider Dağıtım v11.1
+# Gelir Gider Dağıtım v11.2
