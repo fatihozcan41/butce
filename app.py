@@ -2,22 +2,23 @@ import streamlit as st
 import pandas as pd
 from utils.dagitim import dagit_verileri
 
-st.set_page_config(page_title="Gelir Gider Dağıtım v4", layout="wide")
-st.title("📊 Gelir Gider Dağıtım Uygulaması")
+st.set_page_config(page_title="Gelir Gider Dağıtım v5", layout="wide")
 
-st.markdown("""
-Bu uygulama ile:
+with st.sidebar:
+    st.header("📂 Veri Yükle")
 
-- OSGB ve BELGE firmalarının gelir/giderlerini Excel dosyası üzerinden yükleyebilir,
-- Her HESAP İSMİ için OSGB/BELGE oranlarını ayrı ayrı belirleyebilir,
-- BELGE için alt kırılım (Eğitim, İlk Yardım, Kalite, Uzmanlık) oranlarını tanımlayabilir,
-- Tüm oranlar tablo formatında düzenlenip kontrol edilebilir,
-- Aylara göre dağıtılmış tablolar oluşturulabilir.
+    firma = st.selectbox("Firma", ["OSGB", "BELGE"])
+    tur = st.selectbox("Tür", ["Gider", "Gelir"])
+    yil = st.selectbox("Yıl", list(range(2020, 2031)), index=5)
+    ay = st.selectbox("Ay", ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
+                             "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"], index=5)
 
-🔁 Lütfen önce Excel dosyanızı yükleyin, ardından oranları girin ve dağıtımı başlatın.
-""")
+    uploaded_file = st.file_uploader("Excel Dosyası Yükle", type=["xlsx"], help="Limit 200MB")
+    osgb_orani = st.slider("OSGB Oranı (%)", 0, 100, 50)
+    start_button = st.button("Dağıtımı Başlat")
 
-uploaded_file = st.file_uploader("1. Excel Dosyası Yükle (Gelir/Gider)", type=["xlsx"])
+st.title("📊 Gelir-Gider Dağıtım Uygulaması")
+
 if uploaded_file:
     try:
         df = pd.read_excel(uploaded_file)
@@ -29,33 +30,12 @@ if uploaded_file:
         st.error("Excel dosyasında 'HESAP İSMİ' sütunu bulunamadı.")
         st.stop()
 
-    st.success("Dosya yüklendi, HESAP İSMİ'ler listelendi.")
-    hesap_isimleri = df["HESAP İSMİ"].dropna().unique().tolist()
+    st.success("Dosya başarıyla yüklendi. Aşağıda verileri inceleyebilirsiniz.")
+    st.dataframe(df)
 
-    # Varsayılan oran tablosu
-    oran_df = pd.DataFrame({
-        "HESAP İSMİ": hesap_isimleri,
-        "OSGB (%)": [50] * len(hesap_isimleri),
-        "BELGE (%)": [50] * len(hesap_isimleri),
-        "Eğitim": [25] * len(hesap_isimleri),
-        "İlk Yardım": [25] * len(hesap_isimleri),
-        "Kalite": [25] * len(hesap_isimleri),
-        "Uzmanlık": [25] * len(hesap_isimleri),
-    })
-
-    st.markdown("### 2. 🧮 Hesap Bazlı Oran Giriş Tablosu")
-    edited_oran_df = st.data_editor(oran_df, use_container_width=True, num_rows="dynamic")
-
-    st.markdown("### 3. ✅ Dağıtım Sonucu")
-    if st.button("Dağıtımı Başlat"):
-        for i, row in edited_oran_df.iterrows():
-            if row["OSGB (%)"] + row["BELGE (%)"] != 100:
-                st.error(f"{row['HESAP İSMİ']} için OSGB + BELGE oranı %100 değil!")
-                st.stop()
-            if row["BELGE (%)"] > 0:
-                alt_toplam = row["Eğitim"] + row["İlk Yardım"] + row["Kalite"] + row["Uzmanlık"]
-                if alt_toplam != 100:
-                    st.error(f"{row['HESAP İSMİ']} için alt kırılımlar toplamı %100 değil!")
-                    st.stop()
-        st.success("Tüm oranlar geçerli. Dağıtım başlatılıyor...")
-        dagit_verileri(df, edited_oran_df)
+    if start_button:
+        belge_orani = 100 - osgb_orani
+        st.success("Dağıtım tamamlandı (simülasyon).")
+        st.markdown(f"**Firma:** {firma}")
+        st.markdown(f"**OSGB Oranı:** {osgb_orani}% – **BELGE Oranı:** {belge_orani}%")
+        dagit_verileri(df, osgb_orani, belge_orani)

@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım Uygulaması (v4)
+# Gelir Gider Dağıtım Uygulaması (v5)
 
-Ana ekran bilgilendirmeleri ve HESAP İSMİ bazlı oran girişlidir.
+V1 görünümüne sahip, oran girişli, kullanıcı dostu arayüz.
 
 ```bash
 pip install -r requirements.txt
