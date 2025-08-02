@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from utils.dagitim import dagit_verileri
 
-st.set_page_config(page_title="Gelir Gider Dağıtım v9", layout="wide")
+st.set_page_config(page_title="Gelir Gider Dağıtım v10", layout="wide")
 
 # Oturum verileri
 if "gecmis_oranlar" not in st.session_state:
@@ -23,7 +23,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Excel Dosyası Yükle", type=["xlsx"])
     start_button = st.button("Dağıtımı Başlat")
 
-st.title("📊 Gelir-Gider Dağıtım v9 (Tüm Oranlar Tek Tabloda)")
+st.title("📊 Gelir-Gider Dağıtım v10 (3 Ayrı Sonuç Tablosu)")
 
 def oran_tablosu_guncelle(df, yil, ay):
     mevcut = st.session_state["gecmis_oranlar"]
