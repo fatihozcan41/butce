@@ -84,5 +84,6 @@ def dagit_verileri(df, oranlar):
 
     st.markdown("### 🧩 BELGE Alt Kırılım Dağılımı")
     df3 = pd.DataFrame.from_dict(belge_alt_rows, orient="index", columns=aylar)
-    df3.index.names = ["HESAP İSMİ", "ALT KIRILIM"]
+    if not isinstance(df3.index, pd.MultiIndex):
+        df3.index = pd.MultiIndex.from_tuples(df3.index, names=["HESAP İSMİ", "ALT KIRILIM"])
     st.dataframe(df3)
