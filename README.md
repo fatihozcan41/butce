@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım v7
+# Gelir Gider Dağıtım v8
 
-Oranlar tablo şeklinde girilir, önceki ayın oranları otomatik gelir.
+Alt kırılım oranlarını da içeren sürüm.
 
 ```bash
 pip install -r requirements.txt

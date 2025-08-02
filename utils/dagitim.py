@@ -18,3 +18,13 @@ def dagit_verileri(df, oranlar):
         osgb_pay = tutar * osgb / 100
         belge_pay = tutar * belge / 100
         st.write(f"{hesap}: OSGB = {osgb_pay:.2f} TL | BELGE = {belge_pay:.2f} TL")
+
+def dagit_alt_kirilim(df, alt_oranlar):
+    st.markdown("### 📚 Alt Kırılım Dağılımı (BELGE)")
+    for _, row in df.iterrows():
+        hesap = row.get("HESAP İSMİ", "GENEL")
+        belge_tutar = row.get("ANA DÖVİZ TUTAR", 0)
+        st.write(f"🔸 {hesap} Toplam: {belge_tutar:.2f} TL")
+        for isim, oran in alt_oranlar.items():
+            pay = belge_tutar * oran / 100
+            st.markdown(f"  • {isim}: {pay:.2f} TL")

@@ -1,14 +1,16 @@
 import streamlit as st
 import pandas as pd
-from utils.dagitim import dagit_verileri
+from utils.dagitim import dagit_verileri, dagit_alt_kirilim
 
-st.set_page_config(page_title="Gelir Gider Dağıtım v7", layout="wide")
+st.set_page_config(page_title="Gelir Gider Dağıtım v8", layout="wide")
 
 # Oturum durumları
 if "gecmis_oranlar" not in st.session_state:
     st.session_state["gecmis_oranlar"] = pd.DataFrame(columns=["Yıl", "Ay", "HESAP İSMİ", "OSGB", "BELGE"])
+if "alt_kirilim_oranlari" not in st.session_state:
+    st.session_state["alt_kirilim_oranlari"] = {"Eğitim": 25, "İlk Yardım": 25, "Kalite": 25, "Uzmanlık": 25}
 
-# Sol panel (v6 ile aynı yapı korunuyor)
+# Sol panel (v6 ile aynı yapı korunur)
 with st.sidebar:
     st.header("📂 Veri Yükle")
     firma = st.selectbox("Firma", ["OSGB", "BELGE"])
@@ -65,14 +67,21 @@ if uploaded_file:
     st.markdown("### 🎯 Hesap Bazlı Oran Girişi")
     oranlar = oran_tablosu_guncelle(df, yil, ay)
 
-    if start_button:
-        for _, row in oranlar.iterrows():
-            st.session_state["gecmis_oranlar"].loc[
-                (st.session_state["gecmis_oranlar"]["Yıl"] == row["Yıl"]) &
-                (st.session_state["gecmis_oranlar"]["Ay"] == row["Ay"]) &
-                (st.session_state["gecmis_oranlar"]["HESAP İSMİ"] == row["HESAP İSMİ"]),
-                ["OSGB", "BELGE"]
-            ] = row["OSGB"], row["BELGE"]
+    if firma == "BELGE":
+        st.markdown("### 🧩 BELGE Alt Kırılım Oranları")
+        for key in st.session_state["alt_kirilim_oranlari"]:
+            val = st.number_input(f"{key} (%)", min_value=0, max_value=100, step=1,
+                                  value=st.session_state["alt_kirilim_oranlari"][key])
+            st.session_state["alt_kirilim_oranlari"][key] = val
 
+        toplam = sum(st.session_state["alt_kirilim_oranlari"].values())
+        if toplam != 100:
+            st.warning("Alt kırılım oranları toplamı %100 olmalıdır.")
+        else:
+            st.success("Alt kırılım oranları geçerli.")
+
+    if start_button:
         st.success("Dağıtım tamamlandı (simülasyon).")
         dagit_verileri(df, oranlar)
+        if firma == "BELGE":
+            dagit_alt_kirilim(df, st.session_state["alt_kirilim_oranlari"])
