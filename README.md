@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım Uygulaması (v2)
+# Gelir Gider Dağıtım Uygulaması (v3)
 
-Bu proje, OSGB ve BELGE firmaları için yüklenen gelir/gider Excel verilerini oranlara ve aylara göre dağıtarak analiz etmeyi sağlar.
+Bu sürümde her bir HESAP İSMİ için ayrı ayrı OSGB/BELGE ve alt kırılım oranları girilebilir. Tüm oranlar tablo formatında düzenlenir.
 
 ## Kurulum
 
@@ -10,8 +10,6 @@ streamlit run app.py
 ```
 
 ## Özellikler
-- Firma bazlı veri yükleme
-- OSGB / BELGE oranları tanımı (zorunlu)
-- BELGE için alt kırılım oranları kontrolü
-- İşlem kontrol paneli
-- Ay bazlı tablo analizi (geliştirilecek)
+- HESAP İSMİ bazlı oran girişi
+- Toplam kontrolü (OSGB + BELGE = 100, alt kırılım = 100)
+- Oran girişi tablo üzerinden

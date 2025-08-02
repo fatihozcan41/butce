@@ -1,65 +1,41 @@
 import streamlit as st
 import pandas as pd
-from utils.dagitim import dagit_verileri, kontrol_paneli
+from utils.dagitim import dagit_verileri
 
-st.set_page_config(page_title="Gelir Gider Dağıtım", layout="wide")
-st.title("📊 Gelir-Gider Dağıtım Uygulaması")
+st.set_page_config(page_title="Gelir Gider Dağıtım v3", layout="wide")
+st.title("📊 Gelir-Gider Dağıtım (Hesap Bazlı Oran Girişli)")
 
-# Kontrol durumu
-kontrol_durumu = {
-    "Dosya Yüklendi": False,
-    "Oranlar Girildi": False,
-    "Alt Kırılım Girildi": False,
-    "Dağıtım Yapıldı": False
-}
-
-st.sidebar.header("Veri Yükle")
-
-firma = st.sidebar.selectbox("Firma", ["OSGB", "BELGE"])
-tur = st.sidebar.selectbox("Tür", ["Gider", "Gelir"])
-yil = st.sidebar.selectbox("Yıl", list(range(2022, 2027)))
-ay = st.sidebar.selectbox("Ay", ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
-                                 "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"])
-uploaded_file = st.sidebar.file_uploader("Excel Dosyası Yükle", type=["xlsx"])
-
+uploaded_file = st.file_uploader("Excel Dosyası Yükle (Gelir/Gider)", type=["xlsx"])
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
-    kontrol_durumu["Dosya Yüklendi"] = True
-    st.success("Dosya başarıyla yüklendi. Aşağıda verileri inceleyebilirsiniz.")
-    st.dataframe(df)
+    st.success("Dosya yüklendi, HESAP İSMİ'ler listelendi.")
+    hesap_isimleri = df["HESAP İSMİ"].unique().tolist()
 
-    osgb_rate = st.sidebar.number_input("OSGB Oranı (%)", min_value=0, max_value=100, value=0)
-    belge_rate = 100 - osgb_rate
-    st.sidebar.write(f"BELGE Oranı: {belge_rate}%")
+    # Varsayılan oran tablosu
+    oran_df = pd.DataFrame({
+        "HESAP İSMİ": hesap_isimleri,
+        "OSGB (%)": [50] * len(hesap_isimleri),
+        "BELGE (%)": [50] * len(hesap_isimleri),
+        "Eğitim": [25] * len(hesap_isimleri),
+        "İlk Yardım": [25] * len(hesap_isimleri),
+        "Kalite": [25] * len(hesap_isimleri),
+        "Uzmanlık": [25] * len(hesap_isimleri),
+    })
 
-    if osgb_rate + belge_rate != 100:
-        st.warning("OSGB ve BELGE oranlarının toplamı %100 olmalıdır.")
-    else:
-        kontrol_durumu["Oranlar Girildi"] = True
+    st.markdown("### 🧮 Hesap Bazlı Oran Giriş Tablosu")
+    edited_oran_df = st.data_editor(oran_df, use_container_width=True, num_rows="dynamic")
 
-    if firma == "BELGE":
-        st.sidebar.markdown("**Alt Kırılım Oranları**")
-        egitim = st.sidebar.number_input("Eğitim (%)", 0, 100, 0)
-        ilk_yardim = st.sidebar.number_input("İlk Yardım (%)", 0, 100, 0)
-        kalite = st.sidebar.number_input("Kalite (%)", 0, 100, 0)
-        uzmanlik = st.sidebar.number_input("Uzmanlık (%)", 0, 100, 0)
-
-        alt_toplam = egitim + ilk_yardim + kalite + uzmanlik
-        if alt_toplam != 100:
-            st.warning(f"Alt kırılım oranlarının toplamı %100 olmalıdır. Şu an: %{alt_toplam}")
-        else:
-            kontrol_durumu["Alt Kırılım Girildi"] = True
-    else:
-        egitim = ilk_yardim = kalite = uzmanlik = 0
-        kontrol_durumu["Alt Kırılım Girildi"] = True
-
-    if st.sidebar.button("Dağıtımı Başlat"):
-        if all(kontrol_durumu.values()):
-            kontrol_durumu["Dağıtım Yapıldı"] = True
-            st.success("Dağıtım tamamlandı (simülasyon).")
-            dagit_verileri(df, firma, osgb_rate, belge_rate, egitim, ilk_yardim, kalite, uzmanlik)
-        else:
-            st.error("Lütfen tüm oranları doğru şekilde giriniz ve gerekli alanları doldurunuz.")
-
-    st.markdown("## ✅ İşlem Kontrol Paneli")
-    kontrol_paneli(kontrol_durumu)
+    st.markdown("### ✅ Dağıtım Sonucu")
+    if st.button("Dağıtımı Başlat"):
+        # Basit doğrulama
+        for i, row in edited_oran_df.iterrows():
+            if row["OSGB (%)"] + row["BELGE (%)"] != 100:
+                st.error(f"{row['HESAP İSMİ']} için OSGB + BELGE oranı %100 değil!")
+                st.stop()
+            if row["BELGE (%)"] > 0:
+                alt_toplam = row["Eğitim"] + row["İlk Yardım"] + row["Kalite"] + row["Uzmanlık"]
+                if alt_toplam != 100:
+                    st.error(f"{row['HESAP İSMİ']} için alt kırılımlar toplamı %100 değil!")
+                    st.stop()
+        st.success("Tüm oranlar geçerli. Dağıtım başlatılıyor...")
+        dagit_verileri(df, edited_oran_df)
