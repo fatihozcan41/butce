@@ -1,10 +1,7 @@
 import streamlit as st
 
 def dagit_verileri(df, oranlar):
-    st.write("🔎 Dağıtım Oranları:")
-    st.dataframe(oranlar)
-
-    st.write("📊 Örnek Dağıtım:")
+    st.markdown("### 🧾 Dağıtım Sonuçları")
     for _, satir in df.iterrows():
         hesap = satir.get("HESAP İSMİ", "GENEL")
         oran = oranlar[oranlar["HESAP İSMİ"] == hesap]
@@ -13,18 +10,14 @@ def dagit_verileri(df, oranlar):
         else:
             osgb = oran["OSGB"].values[0]
             belge = oran["BELGE"].values[0]
-
         tutar = satir.get("ANA DÖVİZ TUTAR", 0)
         osgb_pay = tutar * osgb / 100
         belge_pay = tutar * belge / 100
-        st.write(f"{hesap}: OSGB = {osgb_pay:.2f} TL | BELGE = {belge_pay:.2f} TL")
+        st.write(f"🔹 {hesap}: OSGB = {osgb_pay:.2f} TL | BELGE = {belge_pay:.2f} TL")
 
-def dagit_alt_kirilim(df, alt_oranlar):
-    st.markdown("### 📚 Alt Kırılım Dağılımı (BELGE)")
-    for _, row in df.iterrows():
-        hesap = row.get("HESAP İSMİ", "GENEL")
-        belge_tutar = row.get("ANA DÖVİZ TUTAR", 0)
-        st.write(f"🔸 {hesap} Toplam: {belge_tutar:.2f} TL")
-        for isim, oran in alt_oranlar.items():
-            pay = belge_tutar * oran / 100
-            st.markdown(f"  • {isim}: {pay:.2f} TL")
+        if not oran.empty:
+            st.markdown("  **BELGE Alt Kırılım Dağılımı:**")
+            for isim in ["Eğitim", "İlk Yardım", "Kalite", "Uzmanlık"]:
+                oran_alt = oran[isim].values[0]
+                alt_pay = belge_pay * oran_alt / 100
+                st.markdown(f"    • {isim}: {alt_pay:.2f} TL")

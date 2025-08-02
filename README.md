@@ -1,6 +1,6 @@
-# Gelir Gider Dağıtım v8
+# Gelir Gider Dağıtım v9
 
-Alt kırılım oranlarını da içeren sürüm.
+Tüm oranlar (OSGB, BELGE, Alt Kırılımlar) tek tabloda girilir.
 
 ```bash
 pip install -r requirements.txt
